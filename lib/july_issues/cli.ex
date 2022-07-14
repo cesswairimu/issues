@@ -1,4 +1,7 @@
 defmodule JulyIssues.CLI do
+
+  import JulyIssues.TableFormatter, only: [ print_table_for_columns: 2]
+
   @default_count 4
 
   def run(argv) do
@@ -35,9 +38,12 @@ defmodule JulyIssues.CLI do
     System.halt(0)
   end
 
-  def process({ user, project, _count }) do
+  def process({ user, project, count }) do
     JulyIssues.GithubIssues.fetch(user, project)
     |> decode_response()
+    |> sort_in_desc_order()
+    |> last(count)
+    |> print_table_for_columns(["number", "created_at", "title"])
   end
 
   def decode_response({:ok, body}), do: body
@@ -46,4 +52,19 @@ defmodule JulyIssues.CLI do
     IO.puts "##ERROR fetching from Github ### ==== #{error["message"]}"
     System.halt(2)
   end
+
+  def sort_in_desc_order(list) do
+    list
+    |> Enum.sort( fn arg1, arg2 ->
+       arg1["created_at"] >= arg2["created_at"] 
+      end)
+  end
+
+  def last(list, count) do
+    list
+    |> Enum.take(count)
+    |> Enum.reverse
+  end
+
+ 
 end
