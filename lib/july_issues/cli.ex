@@ -4,7 +4,7 @@ defmodule JulyIssues.CLI do
 
   @default_count 4
 
-  def run(argv) do
+  def main(argv) do
     argv
     |> parse_args
     |> process
@@ -43,7 +43,7 @@ defmodule JulyIssues.CLI do
     |> decode_response()
     |> sort_in_desc_order()
     |> last(count)
-    |> print_table_for_columns(["number", "created_at", "title"])
+    |> print_table_for_columns(["number", "created_at", "title", "state", "comments_url", "node_id", "labels[:description]"])
   end
 
   def decode_response({:ok, body}), do: body
